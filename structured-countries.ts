@@ -1,5 +1,6 @@
 import ollama from "ollama";
 import { z } from "zod";
+import { writeFile } from "node:fs/promises";
 
 enum FormOfGovernment {
   Anarchy = "Anarchy",
@@ -51,7 +52,7 @@ const CountryList = z.array(Country);
 const countries = ["Japan", "Brazil", "Germany", "Australia", "Canada"];
 
 const stream = await ollama.chat({
-  model: "granite4:3b-h",
+  model: "granite4:350m",
   format: z.toJSONSchema(CountryList),
   stream: true,
   options: {
@@ -70,11 +71,15 @@ const stream = await ollama.chat({
   ],
 });
 
+let message = "";
+
 for await (const chunk of stream) {
   if (chunk.message.thinking) {
     process.stdout.write(chunk.message.thinking);
   }
+  message += chunk.message.content;
   process.stdout.write(chunk.message.content);
 }
 
 process.stdout.write("\n");
+await writeFile("structured-countries-output.json", message);

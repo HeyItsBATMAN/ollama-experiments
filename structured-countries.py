@@ -57,7 +57,7 @@ class CountryList(RootModel):
 countries = ["Japan", "Brazil", "Germany", "Australia", "Canada"]
 
 stream = ollama.chat(
-    model="granite4:3b-h",
+    model="granite4:350m",
     format=CountryList.model_json_schema(),
     stream=True,
     options={
@@ -76,9 +76,14 @@ stream = ollama.chat(
     ],
 )
 
+message = ""
+
 for chunk in stream:
     if hasattr(chunk["message"], "thinking") and chunk["message"].get("thinking"):
         print(chunk["message"]["thinking"], end="", flush=True)
+    message += chunk["message"]["content"]
     print(chunk["message"]["content"], end="", flush=True)
 
 print()  # Final newline
+with open("structured-countries-output.json", "w") as f:
+    f.write(message)
