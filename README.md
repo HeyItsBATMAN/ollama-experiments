@@ -2,6 +2,20 @@
 
 A demonstration project showing how to use Ollama with structured outputs in both Python and TypeScript. This example queries information about countries and enforces a specific JSON schema for the response.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Prerequisites](#prerequisites)
+- [Python Setup](#python-setup)
+  - [Using pip](#using-pip)
+  - [Using uv](#using-uv)
+- [TypeScript Setup](#typescript-setup)
+  - [Using Bun](#using-bun)
+  - [Using Node.js](#using-nodejs)
+- [Output](#output)
+- [Configuration](#configuration)
+- [Troubleshooting](#troubleshooting)
+
 ## Overview
 
 This project demonstrates:
