@@ -32,9 +32,33 @@ The example requests information about several countries (Japan, Brazil, Germany
 
 ## Prerequisites
 
-- **Ollama** must be installed and running on your system
-  - Install from [ollama.com](https://ollama.com)
-  - Pull the required model: `ollama pull granite4:350m`
+### Ollama Installation
+
+**Ollama** must be installed and running on your system. Install it for your operating system:
+
+- **Windows**: Download and run the installer from [ollama.com/download/windows](https://ollama.com/download)
+- **macOS**: Download and run the installer from [ollama.com/download/mac](https://ollama.com/download), or use Homebrew: `brew install ollama`
+- **Linux**: Run the installation script: `curl -fsSL https://ollama.com/install.sh | sh`
+
+After installation:
+1. Start Ollama (it usually starts automatically, or run `ollama serve`)
+2. Pull the required model: `ollama pull granite4:350m`
+
+### Python Requirements
+
+- **Python 3.11 or higher** is required
+  - Check your version: `python --version` or `python3 --version`
+  - Download from [python.org](https://www.python.org/downloads/) if needed
+
+### TypeScript/JavaScript Requirements (Optional)
+
+Only needed if running the TypeScript version:
+
+- **Node.js 18 or higher** (for npm/Node.js method)
+  - Download from [nodejs.org](https://nodejs.org/)
+- **Bun** (alternative to Node.js)
+  - **macOS/Linux**: `curl -fsSL https://bun.sh/install | bash`
+  - **Windows**: Download from [bun.sh](https://bun.sh/) (Note: Windows support is experimental)
 
 ## Python Setup
 
@@ -42,9 +66,22 @@ The example requests information about several countries (Japan, Brazil, Germany
 
 1. **Create and activate a virtual environment:**
 
+**macOS/Linux:**
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+**Windows (PowerShell):**
+```powershell
 python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+.venv\Scripts\Activate.ps1
+```
+
+**Windows (Command Prompt):**
+```cmd
+python -m venv .venv
+.venv\Scripts\activate.bat
 ```
 
 2. **Install dependencies:**
@@ -61,11 +98,31 @@ python structured-countries.py
 
 ### Using uv
 
+[uv](https://github.com/astral-sh/uv) is a fast Python package installer and resolver.
+
+**Install uv:**
+- **macOS/Linux**: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+- **Windows**: `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+- **Using pip**: `pip install uv`
+
 1. **Create and activate a virtual environment:**
 
+**macOS/Linux:**
 ```bash
 uv venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+source .venv/bin/activate
+```
+
+**Windows (PowerShell):**
+```powershell
+uv venv
+.venv\Scripts\Activate.ps1
+```
+
+**Windows (Command Prompt):**
+```cmd
+uv venv
+.venv\Scripts\activate.bat
 ```
 
 2. **Install dependencies:**
@@ -87,6 +144,8 @@ uv run structured-countries.py
 ## TypeScript Setup
 
 ### Using Bun
+
+> **Note for Windows users**: Bun's Windows support is experimental. If you encounter issues, use the Node.js method instead.
 
 1. **Install dependencies:**
 
@@ -149,6 +208,26 @@ You can modify the following parameters in either script:
 
 ## Troubleshooting
 
+### General Issues
+
 - **Connection Error**: Ensure Ollama is running (`ollama serve`)
 - **Model Not Found**: Pull the model with `ollama pull granite4:350m`
 - **Schema Validation Errors**: The model output may occasionally not match the schema perfectly; try adjusting the temperature or using a more capable model
+
+### OS-Specific Issues
+
+**Windows:**
+- If you get a "script execution is disabled" error in PowerShell, run: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
+- Use PowerShell (not Command Prompt) for the best experience
+- If `python` command not found, try `python3` or `py`
+- Ensure Ollama service is running (check system tray icon)
+
+**macOS:**
+- If you get a "command not found" error for Python, use `python3` instead of `python`
+- Ollama runs as a background service; check the menu bar icon
+- If Ollama isn't running, open the Ollama app from Applications
+
+**Linux:**
+- If `ollama serve` fails, check if the service is already running: `systemctl status ollama`
+- You may need to start the service: `systemctl start ollama`
+- If using WSL2 on Windows, you can connect to Ollama running on Windows by setting: `OLLAMA_HOST=http://host.docker.internal:11434`
