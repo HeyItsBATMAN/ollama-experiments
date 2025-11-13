@@ -10,6 +10,9 @@ A demonstration project showing how to use Ollama with structured outputs in bot
 
 - [Overview](#overview)
 - [Prerequisites](#prerequisites)
+  - [Ollama Installation](#ollama-installation)
+  - [Python Requirements](#python-requirements)
+  - [TypeScript/JavaScript Requirements (Optional)](#typescriptjavascript-requirements-optional)
 - [Python Setup](#python-setup)
   - [Using pip](#using-pip)
   - [Using uv](#using-uv)
@@ -19,6 +22,8 @@ A demonstration project showing how to use Ollama with structured outputs in bot
 - [Output](#output)
 - [Configuration](#configuration)
 - [Troubleshooting](#troubleshooting)
+  - [General Issues](#general-issues)
+  - [OS-Specific Issues](#os-specific-issues)
 
 ## Overview
 
