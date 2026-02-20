@@ -1,0 +1,672 @@
+This file is a merged representation of a subset of the codebase, containing files not matching ignore patterns, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching these patterns are excluded: LICENSE
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+pdfs/
+  .gitkeep
+.gitignore
+.python-version
+001-lmstudio-api.py
+002-lmstudio-api-parameters.py
+003-lmstudio-api-system-prompt.py
+004-metadata-extract-pdf.py
+005-metadata-validation.py
+pyproject.toml
+requirements.txt
+schema.py
+TASK.md
+util.py
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="pdfs/.gitkeep">
+
+</file>
+
+<file path="001-lmstudio-api.py">
+import lmstudio as lms
+
+import util
+
+# Wir interagieren über die LMStudio API, um LMStudio zu befehlen, ein Modell zu laden.
+# Vorher lassen wir uns anzeigen, welche Modelle wir heruntergeladen zu haben, um die gültigen Modellnamen zu kennen.
+util.print_available_models()
+
+# Modell laden
+print("Loading model...")
+model = lms.llm(
+    "olmo-2-0425-1b-instruct",
+    # "olmo-3-7b-instruct",
+)
+util.print_loaded_models()
+
+# Chat-Interface
+chat = lms.Chat("You are a helpful assistant.")
+
+chat.add_user_message("What is the capital of Austria?")
+
+# Antwort generiern aus der bisherigen Konversation (System Prompt + User Message)
+response = model.respond(chat)
+
+# Antworten vom Modell landen nicht automatisch im Chat-Verlauf
+# print(chat._messages)
+chat.add_assistant_response(response)
+
+print(response.content)
+
+chat.add_user_message("What is the capital of Germany?")
+
+response = model.respond(chat)
+
+print(response.content)
+</file>
+
+<file path="002-lmstudio-api-parameters.py">
+import lmstudio as lms
+
+import util
+
+# Wir interagieren über die LMStudio API, um LMStudio zu befehlen, ein Modell zu laden.
+# Vorher lassen wir uns anzeigen, welche Modelle wir heruntergeladen zu haben, um die gültigen Modellnamen zu kennen.
+util.print_available_models()
+
+# Modell laden
+print("Loading model...")
+model = lms.llm(
+    "olmo-2-0425-1b-instruct",
+    # "olmo-3-7b-instruct",
+    config={
+        "seed": 42,
+    },
+)
+util.print_loaded_models()
+
+# Chat-Interface
+chat = lms.Chat("You are a helpful assistant.")
+
+chat.add_user_message("What is the capital of Austria?")
+
+# Antwort generiern aus der bisherigen Konversation (System Prompt + User Message)
+response = model.respond(
+    chat,
+    config={
+        "temperature": 0.0,
+    },
+)
+
+chat.add_assistant_response(response)
+
+print(response.content)
+
+chat.add_user_message("What is the capital of Germany?")
+
+response = model.respond(
+    chat,
+    config={
+        "temperature": 0.0,
+    },
+)
+
+print(response.content)
+</file>
+
+<file path="003-lmstudio-api-system-prompt.py">
+import lmstudio as lms
+
+import util
+
+# Wir interagieren über die LMStudio API, um LMStudio zu befehlen, ein Modell zu laden.
+# Vorher lassen wir uns anzeigen, welche Modelle wir heruntergeladen zu haben, um die gültigen Modellnamen zu kennen.
+util.print_available_models()
+
+# Modell laden
+print("Loading model...")
+model = lms.llm(
+    "olmo-2-0425-1b-instruct",
+    # "olmo-3-7b-instruct",
+    config={
+        "seed": 42,
+    },
+)
+util.print_loaded_models()
+
+# Frage: wie können wir den System Prompt nutzen, um die Antworten des Modells zu steuern?
+# Aufgabe:
+# - System Prompt so verändern, dass das Modell nur 1 Wort als Antwort gibt.
+# - System Prompt so verändern, dass das Modell auf Deutsch antwortet.
+# Mehrere Anweisungen können anneinander gehängt werden
+chat = lms.Chat(
+    "You are a helpful assistant. Lorem Ipsum dolor sit amet. Der Himmel ist blau. ",
+)
+
+chat.add_user_message("What is the capital of Austria?")
+
+# Antwort generiern aus der bisherigen Konversation (System Prompt + User Message)
+response = model.respond(
+    chat,
+    config={
+        "temperature": 0.0,
+    },
+)
+
+chat.add_assistant_response(response)
+
+print(response.content)
+
+chat.add_user_message("What is the capital of Germany?")
+
+response = model.respond(
+    chat,
+    config={
+        "temperature": 0.0,
+    },
+)
+
+print(response.content)
+</file>
+
+<file path="004-metadata-extract-pdf.py">
+import os
+
+import lmstudio as lms
+from lmstudio.json_api import AnyPrediction
+
+import util
+
+util.print_available_models()
+
+print("Loading model...")
+model = lms.llm(
+    "olmo-2-0425-1b-instruct",
+    # "olmo-3-7b-instruct",
+    config={
+        "seed": 42,
+    },
+)
+util.print_loaded_models()
+
+
+def process_document(text: str) -> AnyPrediction:
+    chat = lms.Chat(
+        f"You are a helpful assistant that extracts metadata from documents. "
+        # Frage: Wie könnte man den System Prompt so gestalten,
+        # dass das Modell die Ausgabe wie beschrieben in TASK.md generiert?
+    )
+
+    chat.add_user_message(f"Here is the text from the document:\n\n{text}")
+
+    # Die Antwort des Modells wird gestreamt, d.h. wir erhalten sie in Fragmenten, während sie generiert wird.
+    # Dadurch können wir die Ausgabe in Echtzeit anzeigen, wie üblich in bekannten Chat-Interfaces.
+    intermediate_result = ""
+    for fragment in model.respond_stream(
+        chat,
+        config={
+            "temperature": 0.0,
+        },
+    ):
+        print(fragment.content, end="", flush=True)
+        intermediate_result += fragment.content
+
+    print()
+
+    # Modelle geben häufig strukturierte Antworten in Code-Blöcken zurück
+    # Hier extrahieren wir den Inhalt eines JSON-Code-Blocks, falls vorhanden, da die Metadaten in diesem Format erwartet werden.
+    modified_result = util.extract_json_from_response(intermediate_result)
+
+    return modified_result
+
+
+# Hauptprogrammteil:
+# Hier listen wir die PDF-Dateien in einem Verzeichnis auf, lassen den Benutzer eine auswählen,
+# extrahieren den Text Seite für Seite und verarbeiten ihn mit dem LLM, um die gewünschten Metadaten zu extrahieren.
+if __name__ == "__main__":
+    pdf_dir = "./pdfs"
+    pdf_entries = [f for f in os.listdir(pdf_dir) if f.endswith(".pdf")]
+
+    print("\nAvailable PDF Documents:")
+    for index, filename in enumerate(pdf_entries):
+        count = util.get_pdf_page_count(os.path.join(pdf_dir, filename))
+        print(f"[{index}] {filename} ({count} pages)")
+
+    choice = util.user_choice(
+        "Select the number of the PDF you want to process:", pdf_entries
+    )
+    selected_filename = pdf_entries[choice]
+    pdf_file_path = os.path.join(pdf_dir, selected_filename)
+    print(f"\nYou selected: {selected_filename}")
+
+    print(f"Extracting text from {pdf_file_path}...")
+
+    current_page = 0
+    while True:
+        page_text, is_last_page = util.extract_text_from_pdf(
+            pdf_file_path, current_page
+        )
+        current_page += 1
+        print(len(page_text), "characters extracted.")
+
+        print("Processing page text with LLM...")
+        metadata = process_document(page_text)
+
+        print("\n--- Extracted Metadata ---")
+        print(metadata)
+        if is_last_page:
+            print("\nReached the end of the document.")
+            break
+</file>
+
+<file path="005-metadata-validation.py">
+import csv
+import os
+
+import lmstudio as lms
+from lmstudio.json_api import AnyPrediction
+
+import util
+from schema import MetadataSchema
+
+util.print_available_models()
+
+print("Loading model...")
+model = lms.llm(
+    "olmo-2-0425-1b-instruct",
+    # "olmo-3-7b-instruct",
+    config={
+        "seed": 42,
+    },
+)
+util.print_loaded_models()
+
+
+def process_document(text: str) -> AnyPrediction:
+    chat = lms.Chat(
+        f"You are a helpful assistant that extracts metadata from documents. "
+        # Frage: Wie könnte man den System Prompt so gestalten,
+        # dass das Modell die Ausgabe wie beschrieben in TASK.md generiert?
+        # Tipp: Wir können Modellen auch das gesamte Schema geben
+        f"The metadata should be extracted according to the following schema:\n\n{MetadataSchema.model_json_schema()}."
+    )
+
+    chat.add_user_message(f"Here is the text from the document:\n\n{text}")
+
+    # Die Antwort des Modells wird gestreamt, d.h. wir erhalten sie in Fragmenten, während sie generiert wird.
+    # Dadurch können wir die Ausgabe in Echtzeit anzeigen, wie üblich in bekannten Chat-Interfaces.
+    intermediate_result = ""
+    for fragment in model.respond_stream(
+        chat,
+        config={
+            "temperature": 0.0,
+        },
+    ):
+        print(fragment.content, end="", flush=True)
+        intermediate_result += fragment.content
+
+    print()
+
+    # Modelle geben häufig strukturierte Antworten in Code-Blöcken zurück
+    # Hier extrahieren wir den Inhalt eines JSON-Code-Blocks, falls vorhanden, da die Metadaten in diesem Format erwartet werden.
+    modified_result = util.extract_json_from_response(intermediate_result)
+
+    return modified_result
+
+
+# Hauptprogrammteil:
+# Hier listen wir die PDF-Dateien in einem Verzeichnis auf, lassen den Benutzer eine auswählen,
+# extrahieren den Text Seite für Seite und verarbeiten ihn mit dem LLM, um die gewünschten Metadaten zu extrahieren.
+if __name__ == "__main__":
+    pdf_dir = "./pdfs"
+    pdf_entries = [f for f in os.listdir(pdf_dir) if f.endswith(".pdf")]
+
+    print("\nAvailable PDF Documents:")
+    for index, filename in enumerate(pdf_entries):
+        count = util.get_pdf_page_count(os.path.join(pdf_dir, filename))
+        print(f"[{index}] {filename} ({count} pages)")
+
+    choice = util.user_choice(
+        "Select the number of the PDF you want to process:", pdf_entries
+    )
+    selected_filename = pdf_entries[choice]
+    pdf_file_path = os.path.join(pdf_dir, selected_filename)
+    print(f"\nYou selected: {selected_filename}")
+
+    print(f"Extracting text from {pdf_file_path}...")
+
+    current_page = 0
+    # Hier speichern wir die extrahierten Metadaten in einer Liste,
+    # die später in eine CSV-Datei geschrieben wird.
+    csv_results = [
+        [
+            "issue_date",
+            "classification",
+            "language",
+            "places",
+            "signature",
+            "summary",
+        ]
+    ]
+    while True:
+        page_text, is_last_page = util.extract_text_from_pdf(
+            pdf_file_path, current_page
+        )
+        current_page += 1
+        print(len(page_text), "characters extracted.")
+
+        print("Processing page text with LLM...")
+        metadata = process_document(page_text)
+
+        print("\n--- Extracted Metadata ---")
+        print(metadata)
+
+        # Validierung der Metadaten gegen das erwartete Schema (siehe schema.py)
+        try:
+            metadata_object = MetadataSchema.model_validate_json(str(metadata))
+            # Wenn wir die Metadaten erfolgreich extrahieren konnten,
+            # können wir sie in die CSV-Ergebnisliste aufnehmen.
+            print("Metadata validation successful.")
+            csv_results.append(
+                [
+                    metadata_object.issue_date,
+                    metadata_object.classification,
+                    metadata_object.language,
+                    ", ".join(metadata_object.places),
+                    metadata_object.signature,
+                    metadata_object.summary,
+                ]
+            )
+
+        except Exception as e:
+            print("\nMetadata validation failed:", str(e))
+
+        if is_last_page:
+            print("\nReached the end of the document.")
+            break
+
+    with open("extracted_metadata.csv", "w", newline="", encoding="utf-8") as csvfile:
+        writer = csv.writer(csvfile, delimiter=",")
+        writer.writerows(csv_results)
+</file>
+
+<file path="schema.py">
+from enum import Enum
+from typing import List
+
+from pydantic import BaseModel, Field
+
+
+class ClassificationOptions(str, Enum):
+    POLITICAL_CORRESPONDENCE = "Political Correspondence"
+    OFFICIAL_RECORDS = "Official Records"
+    PRINTED_MATERIAL = "Printed Material"
+    LEGAL_DOCUMENTS = "Legal Documents"
+
+
+class LanguageOptions(str, Enum):
+    GERMAN = "German"
+    ITALIAN = "Italian"
+
+
+class MetadataSchema(BaseModel):
+    classification: str
+    language: str
+    issue_date: str
+    places: str | List[str]
+    signature: str
+    summary: str
+
+    # Wir können auch striktere Typen verwenden, um die möglichen Werte einzuschränken:
+    # classification: ClassificationOptions
+    # language: LanguageOptions  # German or italian
+    # issue_date: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}$", description="Date in the format YYYY-MM-DD")
+    # places: List[str]
+</file>
+
+<file path="TASK.md">
+# Task
+
+Extract metadata in json format
+
+CLASSIFICATION OPTIONS - purpose of document
+- Political Correspondence - letters between political parties
+- Official Records - reports without addressee
+- Printed Material - media articles - books
+- Legal Documents - law - decreet
+
+OUTPUT FORMAT:
+{
+  "classification": "",
+  "language": "",
+  "summary": "",
+  "issue_date": "",
+  "places": "",
+  "signature:
+}
+
+INSTRUCTIONS:
+- Choose classification from options above
+- Language: German or Italian
+- Date: YYYY-MM-DD format (or empty string if missing)
+- Place: city name (or empty string if missing)
+- Signature: name or empty if missing
+</file>
+
+<file path="util.py">
+from typing import List, Tuple
+
+from pypdf import PdfReader
+
+
+def get_pdf_page_count(pdf_path: str) -> int:
+    """Returns the number of pages in a given PDF file."""
+    reader = PdfReader(pdf_path)
+    return len(reader.pages)
+
+
+def extract_text_from_pdf(pdf_path: str, page: int) -> Tuple[str, bool]:
+    """Extracts all text from a given PDF file."""
+    reader = PdfReader(pdf_path)
+    is_last_page = page == len(reader.pages) - 1
+    return (reader.pages[page].extract_text(), is_last_page)
+
+
+def user_choice(prompt: str, options: List[str]) -> int:
+    """Prompts the user to select an option from a list."""
+    while True:
+        try:
+            choice = int(input(f"\n{prompt}\n"))
+            if 0 <= choice < len(options):
+                return choice
+            else:
+                print(f"Please enter a number between 0 and {len(options) - 1}.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+
+
+def print_available_models():
+    """Prints the list of available models."""
+    import lmstudio as lms
+
+    print("\nAvailable models:")
+    for downloaded_model in lms.list_downloaded_models():
+        print(f"{downloaded_model.model_key}")
+
+
+def print_loaded_models():
+    """Prints the list of loaded models."""
+    import lmstudio as lms
+
+    print(
+        f"\nLoaded models: {', '.join([x.identifier for x in lms.list_loaded_models()])}"
+    )
+
+
+def extract_json_from_response(response: str) -> str:
+    """Extracts JSON content from a model response, if it is enclosed in a code block."""
+    if "```json" in response:
+        start_index = response.index("```json")
+        if "```" in response[start_index + len("```json") :]:
+            end_index = response.index("```", start_index + len("```json"))
+            json_content = response[start_index + len("```json") : end_index].strip()
+            return json_content
+
+    return response
+</file>
+
+<file path=".gitignore">
+# dependencies (bun install)
+node_modules
+
+# output
+out
+dist
+*.tgz
+
+# code coverage
+coverage
+*.lcov
+
+# logs
+logs
+_.log
+report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# IntelliJ based IDEs
+.idea
+
+# Finder (MacOS) folder config
+.DS_Store
+
+.venv
+
+pdfs/*.pdf
+extracted_metadata.csv
+__pycache__
+</file>
+
+<file path=".python-version">
+3.14
+</file>
+
+<file path="requirements.txt">
+# This file was autogenerated by uv via the following command:
+#    uv pip compile pyproject.toml -o requirements.txt
+annotated-types==0.7.0
+    # via pydantic
+anyio==4.11.0
+    # via
+    #   httpx
+    #   httpx-ws
+    #   lmstudio
+certifi==2025.11.12
+    # via
+    #   httpcore
+    #   httpx
+h11==0.16.0
+    # via
+    #   httpcore
+    #   wsproto
+httpcore==1.0.9
+    # via
+    #   httpx
+    #   httpx-ws
+httpx==0.28.1
+    # via
+    #   httpx-ws
+    #   lmstudio
+httpx-ws==0.8.2
+    # via lmstudio
+idna==3.11
+    # via
+    #   anyio
+    #   httpx
+lmstudio==1.5.0
+    # via ollamaexample (pyproject.toml)
+msgspec==0.20.0
+    # via lmstudio
+pydantic==2.12.5
+    # via ollamaexample (pyproject.toml)
+pydantic-core==2.41.5
+    # via pydantic
+pypdf==6.7.1
+    # via ollamaexample (pyproject.toml)
+sniffio==1.3.1
+    # via anyio
+typing-extensions==4.15.0
+    # via
+    #   lmstudio
+    #   pydantic
+    #   pydantic-core
+    #   typing-inspection
+typing-inspection==0.4.2
+    # via pydantic
+wsproto==1.3.2
+    # via httpx-ws
+</file>
+
+<file path="pyproject.toml">
+[project]
+name = "ollamaexample"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+  "lmstudio>=1.5.0",
+  "pydantic>=2.12.5",
+  "pypdf>=6.7.1",
+]
+</file>
+
+</files>

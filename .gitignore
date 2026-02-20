@@ -34,3 +34,7 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .DS_Store
 
 .venv
+
+pdfs/*.pdf
+extracted_metadata.csv
+__pycache__
