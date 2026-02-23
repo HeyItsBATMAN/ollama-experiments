@@ -1,5 +1,7 @@
 import csv
 import os
+import re
+import unicodedata
 
 import lmstudio as lms
 from lmstudio.json_api import AnyPrediction
@@ -123,6 +125,16 @@ if __name__ == "__main__":
             print("\nReached the end of the document.")
             break
 
-    with open("extracted_metadata.csv", "w", newline="", encoding="utf-8") as csvfile:
+    name_without_ext = os.path.splitext(selected_filename)[0]
+    normalized = unicodedata.normalize("NFKD", name_without_ext)
+    ascii_name = normalized.encode("ascii", "ignore").decode("ascii")
+    slug = re.sub(r"[^\w\s-]", "", ascii_name).strip().lower()
+    slug = re.sub(r"[-\s]+", "-", slug)
+    csv_filename = f"{slug}.csv"
+
+    if os.path.exists(csv_filename):
+        os.remove(csv_filename)
+
+    with open(csv_filename, "w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile, delimiter=",")
         writer.writerows(csv_results)
